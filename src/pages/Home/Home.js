@@ -1,14 +1,45 @@
 import "./home.scss";
 import { DataGrid } from "@mui/x-data-grid";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { userColumns, userRows, userRows2 } from "../../data/dataTable.mock";
+import {
+  userColumns,
+  userColumnsJsonPlaceHolder,
+  userColumnsRandomUser,
+  userRowJsonPlaceholder,
+  userRowRandomUser,
+  userRows,
+  userRows2,
+} from "../../data/dataTable.mock";
 import { useContactsQuery } from "../../services/contactsApi";
+
+const convertData = userRowRandomUser.map((item, index) => {
+  return { ...item, index: index + 1 };
+});
+console.log(
+  "🚀TCL: ~ file: Home.js ~ line 19 ~ convertData ~ convertData",
+  convertData
+);
 
 const Home = () => {
   // const { data, isLoading, error } = useContactsQuery();
   // const [data, setData] = useState(userRows);
-  const [data, setData] = useState(userRows2.data);
+  const [data, setData] = useState(convertData);
+  console.log("🚀TCL: ~ file: Home.js ~ line 20 ~ Home ~ data", data);
+
+  // useEffect(() => {
+  //   setData((prev) =>
+  //     prev.map((item, index) => {
+  //       const result = { ...item, index };
+  //       console.log(
+  //         "🚀TCL: ~ file: Home.js ~ line 25 ~ prev.map ~ result",
+  //         index,
+  //         result
+  //       );
+  //       return result;
+  //     })
+  //   );
+  // }, []);
 
   // const rows = [
   //   { id: 1, col1: "Hello", col2: "World" },
@@ -20,12 +51,13 @@ const Home = () => {
   //   { field: "col1", headerName: "Column 1", width: 150 },
   //   { field: "col2", headerName: "Column 2", width: 150 },
   // ];
-
+  // todo increase index
   const actionColumn = [
     {
       field: "action",
       headerName: "Action",
-      width: 200,
+      minWidth: 200,
+      flex: 2,
       renderCell: (params) => {
         return (
           <div className='cellAction'>
@@ -49,10 +81,11 @@ const Home = () => {
       </div>
       <DataGrid
         className='datatable__datagrid'
+        getRowId={(row) => row.login.uuid}
         rows={data}
-        columns={userColumns.concat(actionColumn)}
-        pageSize={9}
-        rowsPerPageOptions={[9]}
+        columns={userColumnsRandomUser.concat(actionColumn)}
+        pageSize={10}
+        // rowsPerPageOptions={[9]}
         checkboxSelection
       />
       {/* <h1>Home</h1>
