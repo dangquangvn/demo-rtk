@@ -11,35 +11,28 @@ import {
   userRows,
   userRows2,
 } from "../../data/dataTable.mock";
-import { useContactsQuery } from "../../services/contactsApi";
+import { useContactsQuery, useGetUsersQuery } from "../../services/contactsApi";
+import { Box, Button } from "@mui/material";
+import { convertData2 } from "../../utils/helper";
 
-const convertData = userRowRandomUser.map((item, index) => {
-  return { ...item, index: index + 1 };
-});
-console.log(
-  "🚀TCL: ~ file: Home.js ~ line 19 ~ convertData ~ convertData",
-  convertData
-);
+// const convertData = userRowRandomUser.map((item, index) => {
+//   return { ...item, index: index + 1 };
+// });
 
 const Home = () => {
-  // const { data, isLoading, error } = useContactsQuery();
-  // const [data, setData] = useState(userRows);
-  const [data, setData] = useState(convertData);
-  console.log("🚀TCL: ~ file: Home.js ~ line 20 ~ Home ~ data", data);
+  const [page, setPage] = useState(1);
+  const {
+    data: users,
+    isLoading,
+    isSuccess,
+    refetch,
+  } = useGetUsersQuery({ results: 10 * page });
 
   // useEffect(() => {
-  //   setData((prev) =>
-  //     prev.map((item, index) => {
-  //       const result = { ...item, index };
-  //       console.log(
-  //         "🚀TCL: ~ file: Home.js ~ line 25 ~ prev.map ~ result",
-  //         index,
-  //         result
-  //       );
-  //       return result;
-  //     })
-  //   );
-  // }, []);
+  //   if (isLoading) {
+  //     setData(convertData2(users?.results));
+  //   }
+  // }, [users, isLoading, isSuccess]);
 
   // const rows = [
   //   { id: 1, col1: "Hello", col2: "World" },
@@ -71,27 +64,48 @@ const Home = () => {
     },
   ];
 
+  const handleGetRandomUsers = () => {
+    refetch();
+    // setPage(page + 1);
+  };
+
   return (
     <div className='datatable'>
-      <div className='datatable__title'>
-        Add New User
-        <Link to={"/users/new"} className='datatable__link'>
-          Add New
-        </Link>
-      </div>
-      <DataGrid
-        className='datatable__datagrid'
-        getRowId={(row) => row.login.uuid}
-        rows={data}
-        columns={userColumnsRandomUser.concat(actionColumn)}
-        pageSize={10}
-        // rowsPerPageOptions={[9]}
-        checkboxSelection
-      />
-      {/* <h1>Home</h1>
-      <div style={{ height: 300 }}>
-        <DataGrid rows={rows} columns={columns} />
-      </div> */}
+      {isLoading ? (
+        <h3>Loading...</h3>
+      ) : (
+        <>
+          <div className='datatable__title'>
+            Add New User
+            <Box>
+              {/* <Link to={"/users/new"} className='datatable__link'>
+                Add New
+              </Link> */}
+              <Button
+                component={Link}
+                to='/about'
+                variant='outlined'
+                color='primary'
+              >
+                About Page
+              </Button>
+              <Button variant='outlined' onClick={handleGetRandomUsers}>
+                Get Random Users
+              </Button>
+            </Box>
+          </div>
+          {/* {JSON.stringify(data)} */}
+          <DataGrid
+            className='datatable__datagrid'
+            getRowId={(row) => row.login.uuid}
+            rows={users}
+            columns={userColumnsRandomUser.concat(actionColumn)}
+            pageSize={10}
+            rowsPerPageOptions={[10]}
+            checkboxSelection
+          />
+        </>
+      )}
     </div>
   );
 };
